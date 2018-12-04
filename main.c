@@ -1,19 +1,41 @@
 #include <stdio.h>
 #include <string.h>
 
+void guess_check(char guess[], char avl_letters[], char guessed_letters[]){/* Function to check if a guess has been made before and if not, add the guess to a list of guess letters. 
+Inputs: Guess, available letters and guessed_letters array.
+Output: nothing
+*/
+
+	if (strchr(guessed_letters, *guess) == NULL){ //checks if guess has already been used
+		strncat(guessed_letters, guess, 1); // if not then adds to list of used letters
+		int i = 0;
+		for (i=0; i<=strlen(avl_letters); i++){ // And remove from alpha list
+			if(avl_letters[i] == *guess){
+				avl_letters[i] = ' '; 
+				continue;
+			}
+		}
+	}
+}
+
+
+
+
 int main(void) { // Start main loop
 
 char word[] = "Hangman";	// Assign main word as Hangman for now
-printf("%s", word); //DB
+//printf("%s", word); //DB
 int len = strlen(word);
-printf("\n%d", len); //DB
+//printf("\n%d", len); //DB
 
 //Initialise values
 int attempts = 6; 
 int correct_guesses = 0;
-char guessed_letters[len+1]; // Should start with an array holding _ values
+int correct_letters = 0;
+char display_letters[len+1]; // Should start with an array holding _ values
 char alpha[] = "abcdefghijklmnopqrstuvwxyz"; // Available guesses
-printf("\n%s", alpha); //DB
+char guessed_letters[sizeof(alpha)-len];
+//printf("\n%s", alpha); //DB
 
 // Start the game
 printf("Welcome to Hangman!\n\nI am thinking of a word with " "%d" " letters.\n\nI will give you six attempts to guess all of the letters in it!\n", len);
@@ -23,67 +45,62 @@ printf("Welcome to Hangman!\n\nI am thinking of a word with " "%d" " letters.\n\
 
 int i;
 for (i = 0; i<= len; i++){
-			strcat(guessed_letters, "_ ");			
+			strcat(display_letters, "_ ");			
 }
 
-// MAin loop of the game.
+// Main loop of the game.
 
-printf("The word is: %s", guessed_letters);
+printf("The word is: %s", display_letters);
 
 while (attempts > 0){
 
 
 //Take guess, add it to a list of letters and check if it has already been used. If it has been used then reject and continue. 
-	printf("\nAvailable letters: %s",alpha);
-	printf("\nYou have %d" ,attempts ,"attempts left.\n");
+	printf("\nLetters available: %s", alpha);
+	printf("\nYou have %d attempts left.\n", attempts);
 	char guess[2];
-	scanf("Please make a guess?: %c", guess)
-	if guess in guessed_letters:
-		print ('\nYou have already used that letter! Try again.\n')
-		continue
-	else:
-		guessed_letters += guess
-		alpha = alpha.replace(guess, '')*/
-
-
-}
-
-
-
-
-
-
-/* Main game loop of guessing and updating the letters in the display word. 
-while attempts > 0:
-
-
+	printf("Please make a guess?: ");
+	scanf("%c", guess);
+	
+	// Check if letter has been guessed yet and update guessed list or reject
+	guess_check(guess, alpha, guessed_letters);
+	
 	
 
-	#Checks if the guess is in the word or not and carries out the appropriate response.
-	if word.find(guess) >= 0: 
-		#Correct anwser response: Creates a list showing the index of correct letter guesses in the word then replaces the values in the blanked out display word with the correct letter guesses.
-		print ('\nLucky Guess!.\n\n**********************************\n\n') 	
-		correct_letters = ([i for i, char in enumerate(list_letters) if char == guess])
-		for i in range(0, len(correct_letters)):
-			display_letters[correct_letters[i]] = guess
-		
-		#Adds the correct letter found including multiples.
-		correct_guesses += (1*(len(correct_letters)))
-		
-		#Win condition, Checks if all the letters have been guessed correctly and exits the loop.
-		if correct_guesses == word_lenght:
-			print('Congratulations, You beat me!\n\nThe word was', word)
-			break
+	
+	// Now we need to check if it is a correct guess or not. 	
+	if (strchr(word, *guess) == NULL){ //checks if guess has already been used.
+		//If guess is not in word then remove attempt and print incorrect dialogue and restart loop
+		attempts = attempts - 1;
+		printf("\nOops, That letter does not feature in the word I am thinking of!\n\n**********************************\n\nYou have %d attempts left.\n", attempts);
+		//Check if game is over and escape if all attempts are used up. 
+		if (attempts <= 0){
+			printf("GAME OVER....you lose!\nThe word was %s", word);
+			break;
+		}	
 
-	#Incorrect answer response: Reduces the attempts by one. If the attempts have run out then then pronts Game over response and exits loop. 
-	else:
-		attempts -= 1
-		print('\nOops, That letter does not feature in the word I am thinking of!\n\n**********************************\n\nYou have',attempts ,'attempts left.\n')
-		if attempts <= 0:
-			print('GAME OVER....you lose!\nThe word was', word)
-			break */
-
+	}
+	//If the letter is in the word than increase correct guesses, print correct guess dialogue and check if they have won and restart loop or end game. 
+	else{
+		correct_letters = 0;
 		
+		printf("\nLuck Guess!.\n\n**********************************\n\n");
+		for (i=0; i<=strlen(word); i++){ // checks which letter is equal to guess and replaces the corresponding letter in the hidden letters with the guess. 
+			if(*guess == word[i]){
+				display_letters[i] = *guess;
+				correct_letters = correct_letters + 1;
+
+			}
+		}
+		correct_guesses = correct_guesses + correct_letters;
+	//Win condition. Succesful letter guesses are equal to number of letters	
+	}	if (correct_guesses == len){
+			printf("Congratulations, You beat me!\n\nThe word was %s", word);
+			break;
+
+		}
+}	
+}		
 
 
 
